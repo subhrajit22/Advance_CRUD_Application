@@ -3,7 +3,7 @@ const { model } = require("mongoose");
 const schema = require("../Model/User");
 const router = express.Router();
 
-exports.Post = async (req, res) => {
+exports.Post = async (req, res,next) => {
 
     const data = new schema({
         StudentId: req.body.StudentId,

@@ -18,6 +18,7 @@ exports.getAll = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
     try {
         const StudentId = req.params.id;
+        //console.log(StudentId);
         const data = await schema.findById(req.params.id);
         res.status(200).json(data);
     }
