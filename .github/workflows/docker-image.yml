@@ -54,8 +54,11 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
-          source: docker-compose.yml
+          source: docker-compose.yaml
           target: /home/${{ secrets.VM_USER }}/
+          timeout: 30s
+          command_timeout: 10m
+          overwrite: true
       # 8. Deploy docker compose 
       - name: Deploy to VM with Docker Compose
         uses: appleboy/ssh-action@v1.0.3
