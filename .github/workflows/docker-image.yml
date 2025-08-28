@@ -41,12 +41,12 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/express-app:${{ github.sha }}
       # 6. Change the image name with tag
       - name: Change ta image name with tag
-        run: cat docker-compose.yaml
-           #sudo sed -i "s|build|#build|g"  docker-compose.yaml
-           #sudo sed -i "s|context|#context|g"  docker-compose.yaml
-           #sudo sed -i "s|dockerfile|#dockerfile|g"  docker-compose.yaml
-           #sudo sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/express-app:${{ github.sha }}" docker-compose.yaml              
-           #shell: bash
+        run: |
+           sudo sed -i "s|build|#build|g"  docker-compose.yaml
+           # sudo sed -i "s|context|#context|g"  docker-compose.yaml
+           # sudo sed -i "s|dockerfile|#dockerfile|g"  docker-compose.yaml
+           # sudo sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/express-app:${{ github.sha }}" docker-compose.yaml              
+           # shell: bash
       # 7. Tranfer Docker Compose to remote VM using 
       - name: Copy docker-compose.yml to VM
         uses: appleboy/scp-action@v0.1.7
