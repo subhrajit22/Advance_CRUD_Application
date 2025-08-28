@@ -1,0 +1,72 @@
+name: Node.js CI/CD
+
+on:
+  push:
+    branches:
+      - master  # Run workflow on pushes to main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      # 3. Install dependencies & build app
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Log in to DockerHub
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # 5. Build & push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/express-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/express-app:${{ github.sha }}
+      # 6. Change the image name with tag
+      - name: Change ta image name with tag
+        run: |
+           sudo sed -i "s|build|#build|g"  docker-compose.yaml
+           sudo sed -i "s|context|#context|g"  docker-compose.yaml
+           sudo sed -i "s|dockerfile|#dockerfile|g"  docker-compose.yaml
+           sudo sed -i "s/image: .*/image: ${{ secrets.DOCKERHUB_USERNAME }}\/express-app:${{ github.sha }}/g" docker-compose.yaml
+           # shell: bash
+      # 7. Tranfer Docker Compose to remote VM using 
+      - name: Copy docker-compose.yml to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: docker-compose.yaml
+          target: /home/${{ secrets.VM_USER }}/
+          timeout: 30s
+          command_timeout: 10m
+          overwrite: true
+      # 8. Deploy docker compose 
+      - name: Deploy to VM with Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+              cd /home/${{ secrets.VM_USER }}/
+              docker compose down --rmi all
+              docker compose up -d 
