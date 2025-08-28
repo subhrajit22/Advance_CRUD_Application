@@ -12,9 +12,16 @@ services:
     environment:   
       - MONGO_URI=mongodb://mongo:27017/blog-app
     depends_on:
-       - mongo
+      mongo:
+        condition: service_healthy
   mongo:
     image: mongo:latest
     container_name: mongo-container
     ports:
       - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
