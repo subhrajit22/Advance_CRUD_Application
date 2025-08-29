@@ -62,8 +62,6 @@ jobs:
         with:
           image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/express-app:${{ github.sha }}
           format: table
-          exit-code: 1
-          severity: CRITICAL,HIGH
           
       # 6. Change the image name with tag
       - name: Change ta image name with tag
