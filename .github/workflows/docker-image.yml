@@ -33,6 +33,12 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             
+      - name: SonarQube Quality Gate Check
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        with:
+          host-url: ${{ secrets.SONAR_HOST_URL }}
+          token: ${{ secrets.SONAR_TOKEN }
+            
       # 4. Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v3
@@ -48,6 +54,7 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/express-app:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/express-app:${{ github.sha }}
+            
       # 6. Change the image name with tag
       - name: Change ta image name with tag
         run: |
